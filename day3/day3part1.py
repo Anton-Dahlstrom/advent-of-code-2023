@@ -1,5 +1,4 @@
 
-# with open("day3/temp.txt", "r") as file:
 with open("day3/day3input.txt", "r") as file:
     lineIndex = file.readlines()
     toAdd = []
@@ -51,5 +50,4 @@ with open("day3/day3input.txt", "r") as file:
     total = 0
     for number in numbers:
         total += int(number)
-    print(numbers)
     print(total)
