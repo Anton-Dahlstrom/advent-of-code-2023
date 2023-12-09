@@ -14,7 +14,4 @@ with open("day8/day8input.txt", "r") as file:
         for char in lines[0].strip():
             count += 1
             current = hmap[current][char]
-print(current)
 print(count)
-
-# print(hands)
