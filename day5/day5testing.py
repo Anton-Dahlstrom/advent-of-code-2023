@@ -1,24 +1,28 @@
-
+import copy
 with open("day5/day5input.txt", "r") as file:
-    seeds = []
+
     lines = file.readlines()
     for i in range(0, len(lines)):
         lines[i] = lines[i].strip()
-
+        
+    seeds = []
     temp = []
-    for number in lines[0].split(" "):
-        if number.isdigit():
-            if temp:
-                temp.append(temp[0] + int(number)-1)
-                seeds.append([temp])
-                temp = []
-            else:
-                temp.append(int(number))
+    for line in lines:
+        if not line:
+            break
+        for number in line.split(" "):
+            if number.isdigit():
+                if temp:
+                    temp.append(temp[0] + int(number)-1)
+                    seeds.append([temp,temp])
+                    temp = []
+                else:
+                    temp.append(int(number))
+    seeds = sorted(seeds)
+    print(seeds)
 
-    step = 0
     ranges = []
     temp = []
-
     # Adding ranges for each stage. First array is destination range, second is source.
     for line in reversed(lines):
         if line:
@@ -37,92 +41,69 @@ with open("day5/day5input.txt", "r") as file:
         if ranges[i][0][0][0]:
             ranges[i].insert(0, [[0,ranges[i][0][0][0]-1], [0,ranges[i][0][0][0]-1]])
         if ranges[i][-1][0][1] < 100:
-            ranges[i].append([[ranges[i][-1][0][1]-1, 100], [ranges[i][-1][0][1], 100]])
-
+            ranges[i].append([[ranges[i][-1][0][1]+1, 100], [ranges[i][-1][0][1]+1, 100]])
     ranges.append(seeds)
 
-    for x in ranges[0]:
-        print(x)
-        for y in ranges[1]:
-            for z in ranges[2]:
-        print(x)
-    exit()
-    # def searchUp(ranges, toSearch, index):
-    #     values = []
-    #     returning = False
-    #     if index == len(ranges)-1:
-    #         returning = True
-    #     print("ranges index:", index, toSearch, ranges[index])
-    #     for upRange in ranges[index]:
-    #         if upRange[0][0] > toSearch[1]:
-    #             break
-    #         elif upRange[0][1] >= toSearch[0]:
-    #             next = [max(upRange[0][0], toSearch[0])]
-    #             next.append(min(upRange[0][1], toSearch[1]))
-    #             if returning:
-    #                 return next
-    #                 print(next)
-    #                 exit()
-    #             value = searchUp(ranges, next, index+1)
-    #             if value:
-    #                 values.append(value)
-    #                 return value
-    #     return 
+    def overlappingRange(toFind, upperList):
+        all = []
+        for upRan in upperList:
+            if upRan[0][0] > toFind[1]:
+                break
+            elif upRan[0][1] >= toFind[0]:
+                overlap = [max(upRan[0][0], toFind[0]), min(upRan[0][1], toFind[1])]
+                lowDiff = overlap[0] - upRan[0][0]
+                upDiff = upRan[0][1] - overlap[1]
+                all.append([upRan[1][0] + lowDiff, upRan[1][1] - upDiff])
+        return all
+    
+    # should return [69, 69], [0, 54]
+    checkAll = overlappingRange(ranges[0][0][1], ranges[1])
+
+    def findSmallestSeed(ranges):
+        for ran in ranges[0]:
+            current = overlappingRange(ran[1], ranges[1])
+            for i in range(2, len(ranges)):
+                total = []
+                for cur in current:
+                    temp = overlappingRange(cur, ranges[i])
+                    if temp:
+                        for tem in temp:
+                            total.append(tem)
+                if total:
+                    current = copy.deepcopy(total)
+                else:
+                    break
+                if i == len(ranges)-1:
+                    if total:
+                        num = current[0]
+                        print(current)
+                        return num
+                    
+    seeds = findSmallestSeed(ranges)
     
 
-    def searchUp(ranges, toSearch, index):
-        values = []
-        returning = False
-        if index == len(ranges)-1:
-            returning = True
-        # print("ranges index:", index, toSearch, ranges[index])
-        for upRange in ranges[index]:
-            if upRange[0][0] > toSearch[1]:
-                break
-            elif upRange[0][1] >= toSearch[0]:
-                lowDiff = max(upRange[0][0], toSearch[0]) - min(upRange[0][0], toSearch[0])
-                topDiff = max(upRange[0][1], toSearch[1]) - min(upRange[0][1], toSearch[1])
-                # print(lowDiff, topDiff)
-                next = [upRange[1][0] + lowDiff]
-                next.append(upRange[1][1] - topDiff)
-                values.append(next)
-                # if index == 2 or index == 3:
-                print("ranges index:", index, toSearch, next, ranges[index])
-                # print("THESE:", toSearch, "NEXT:", next, upRange[0])
-                if returning:
-                    return next
-        allRanges = []
-        for value in values:
-            recur = searchUp(ranges, value, index+1)
-            if recur:
-                allRanges.append(recur)
-        if allRanges:
-            return allRanges
+    def test(ranges, seedNum):
+        for row in ranges[-2::-1]:
+            for array in row:
+                if seedNum in range(array[1][0], array[1][1]):
+                    difference = seedNum - array[1][0]
+                    seedNum = array[0][0] + difference
+                    break
+        return seedNum
+    smallest = None
 
-        
-        # need to keep looking
-        return 
-    # for start in ranges[0]:
-    #     print("ASD", start[1])
-    #     # print("START", start)
-    #     asd = searchUp(ranges, start[1], 1)
-    #     if asd:
-    #         print("FINAL:", asd)
-    #         break
-    # final = asd[0]
-    # print(final)
-    print(searchUp(ranges, [46,46], 1))
-    # for i in reversed(range(0, len(ranges)-1)):
-    #     for rangelist in ranges[i]:
-    #         # print(rangelist[1][0], rangelist[1][0])
-    #         if final in range(rangelist[1][0], rangelist[1][1]):
-    #             difference = final - rangelist[1][0]
-    #             final = rangelist[0][0] + difference
-    #             break
+    for i in range(seeds[0], seeds[0]+1):
+        result = test(ranges, i)
+        if not smallest:
+            smallest = result
+            print(smallest)
+        if result < smallest:
+            print(smallest)
 
-    # for a in ranges:
-    #     print(a)
-    exit()
+
+
+    # 24092691 is too high
+
 
 
     # First we need to look for any numbers below the smallest dest/source range
