@@ -7,6 +7,7 @@ with open("day5/day5input.txt", "r") as file:
         
     seeds = []
     temp = []
+    # Finds all the seeds.
     for line in lines:
         if not line:
             break
@@ -23,7 +24,7 @@ with open("day5/day5input.txt", "r") as file:
 
     ranges = []
     temp = []
-    # Adding ranges for each stage. First array is destination range, second is source.
+    # Adding ranges for each transformation stage. First array is destination range, second is source.
     for line in reversed(lines):
         if line:
             if line[0].isnumeric():
@@ -44,6 +45,7 @@ with open("day5/day5input.txt", "r") as file:
             ranges[i].append([[ranges[i][-1][0][1]+1, 100], [ranges[i][-1][0][1]+1, 100]])
     ranges.append(seeds)
 
+    # Finds all the overlapping ranges
     def overlappingRange(toFind, upperList):
         all = []
         for upRan in upperList:
@@ -58,6 +60,7 @@ with open("day5/day5input.txt", "r") as file:
     
     # should return [69, 69], [0, 54]
     checkAll = overlappingRange(ranges[0][0][1], ranges[1])
+
 
     def findSmallestSeed(ranges):
         for ran in ranges[0]:
@@ -77,8 +80,7 @@ with open("day5/day5input.txt", "r") as file:
                     if total:
                         num = current[0]
                         print(current)
-                        return num
-                    
+                        return num              
     seeds = findSmallestSeed(ranges)
     
 
@@ -90,8 +92,8 @@ with open("day5/day5input.txt", "r") as file:
                     seedNum = array[0][0] + difference
                     break
         return seedNum
+    
     smallest = None
-
     for i in range(seeds[0], seeds[0]+1):
         result = test(ranges, i)
         if not smallest:
@@ -99,8 +101,6 @@ with open("day5/day5input.txt", "r") as file:
             print(smallest)
         if result < smallest:
             print(smallest)
-
-
 
     # 24092691 is too high
 
