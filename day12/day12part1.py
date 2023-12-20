@@ -26,8 +26,9 @@ with open("day12/day12input.txt", "r") as file:
         goal = int(spring[1][goalIndex])
         consecutive = 0
 
-        # The temparary string with current solution and a temporary array that saves index where the first change of a sequence is made
-        # and the index of the goal it fulfilled.
+        # The temparary string with current solution and the original string. 
+        # Temporary array that saves index where the first change of a sequence is made and the index of the goal it fulfilled.
+        originalString = spring[0]
         solutionString = spring[0]
         changes = []
         # Saves the index of the first change. If no changes were made it's set below zero to indicate the goal was solved without changes.
@@ -39,59 +40,73 @@ with open("day12/day12input.txt", "r") as file:
         # When this fails to fulfill all goals we move backwards removing the last and second last sequence of broken springs and
         # turning the first broken spring of the first sequence into a working spring.
         # Reapeat until we've found all possible permutations that fulfill all goals.
-         
-        for j, char in enumerate(spring[0]):            
-            # If we find the amount of broken springs we are looking for we break, reset consecutive counter and search for the next goal.
-            if consecutive == goal:
-                # solutionString = charReplace(solutionString, j, ".")
-                if changeIndex >= 0:
-                    changes.append([changeIndex, goalIndex])
-                    changeIndex = -1
+        solving = True
+        starting = 0
+        while solving:
+            if changes:
+                starting = changes[-1][0]
+                goal = int(spring[1][changes[-1][1]]) 
+            for j in range(starting, len(originalString)):            
+                # If we find the amount of broken springs we are looking for we break, reset consecutive counter and search for the next goal.
+                if consecutive == goal:
+                    # solutionString = charReplace(solutionString, j, ".")
+                    if changeIndex >= 0:
+                        changes.append([changeIndex, goalIndex])
+                        changeIndex = -1
+                    consecutive = 0
+                    if goalIndex < len(spring[1])-1:
+                        goalIndex += 1
+                        goal = int(spring[1][goalIndex])
+                    else:
+                        goalIndex +=1
+                        print("solved", j, i)
+                        break
+                    continue
+                if originalString[j] == "#":
+                    consecutive += 1
+                    continue
+
+                # Calculates how long the streak of broken springs can and has to be if we change ? to a broken spring.
+                if originalString[j] == "?":
+                    open = 0
+                    guaranteed = 0  
+                    for x in originalString[j+1:]:
+                        if x == ".": 
+                            break
+                        open += 1
+                    for y in originalString[j+1:]:
+                        if y != "#":
+                            break
+                        guaranteed += 1 
+                    # Calculates the largest possible streak that can be made and checks if it's big enough to satisfy the next goal.
+                    if consecutive + 1 + open >= goal:
+                        # Checks if the smallest possible streak is too big for our goal.
+                        if consecutive + guaranteed + 1 <= goal:
+                            # If both tests are passed we replace the ? with a broken spring and add to the consecutive counter.
+                            solutionString = charReplace(solutionString, j, "#")
+                            consecutive += 1
+
+                            # Saves where this streak of changes started so we can check for more possible permutations.
+                            if changeIndex < 0:
+                                changeIndex = j
+                            continue
+
+                # If the code reaches this point the spring has to be working so he consecutive counter resets.
+
                 consecutive = 0
-                if goalIndex < len(spring[1])-1:
-                    goalIndex += 1
-                    goal = int(spring[1][goalIndex])
-                else:
-                    break
-                continue
-            if char == "#":
-                consecutive += 1
-                continue
-
-            # Calculates how long the streak of broken springs can and has to be if we change ? to a broken spring.
-            if char == "?":
-                open = 0
-                guaranteed = 0  
-                for x in spring[0][j+1:]:
-                    if x == ".": 
-                        break
-                    open += 1
-                for y in spring[0][j+1:]:
-                    if y != "#":
-                        break
-                    guaranteed += 1 
-                # Calculates the largest possible streak that can be made and checks if it's big enough to satisfy the next goal.
-                if consecutive + 1 + open >= goal:
-                    # Checks if the smallest possible streak is too big for our goal.
-                    if consecutive + guaranteed + 1 <= goal:
-                        # If both tests are passed we replace the ? with a broken spring and add to the consecutive counter.
-                        solutionString = charReplace(solutionString, j, "#")
-                        consecutive += 1
-
-                        # Saves where this streak of changes started so we can check for more possible permutations.
-                        if changeIndex < 0:
-                            changeIndex = j
-                        continue
-
-            # If the code reaches this point the spring has to be working so he consecutive counter resets.
-
-            consecutive = 0
-            # solutionString = charReplace(solutionString, j, ".")  
-        print(solutionString)
-        if changes:
-            print("J", i)
-            indexes.append(changes)
-for ind in indexes:
-    print(ind)
+                # solutionString = charReplace(solutionString, j, ".")  
+            # print(solutionString)
+            print(spring[1], goalIndex)
+            # Checks if we solved all the goals.
+            if goalIndex == len(spring[1]) or goalIndex == len(spring[1]) -1 and consecutive == goal:
+                print("hi")
+            solving = False
+            if changes:
+                # print("J", i)
+                indexes.append(changes)
+                # print(changes)
+                # print("HI", changes[-1])
+# for ind in indexes:
+#     print(ind)
 
         
