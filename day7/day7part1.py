@@ -21,22 +21,34 @@ with open("day7/day7input.txt", "r") as file:
                 value = values[key]
             else:
                 value = int(key)
-            temp = [hmap[key], value]
+            temp.append([hmap[key], value])
         temp.sort(reverse=True)
-        sortedHands.append([[temp], hand[1]])
+        sortedHands.append([temp, hand[1]])
 
-    
     finalHands = []
     while sortedHands:
-        highest = [0,0,0]
+        index = 0
+        highest = [[0]]
         for i in range(len(sortedHands)):
-            print(sortedHands[i][0][0][0])
-            count, cardvalue, = sortedHands[i][0][0][0], sortedHands[i][0][0][1]
-            print(highest)
-            if count > highest[0]:
-                highest = [count, cardvalue, i]
-        toPop = highest[2]
+            hand = sortedHands[i][0]
+            for j in range(len(hand)):
+                if hand[j][0] == highest[j][0]:
+                    if hand[j][1] > highest[j][1]:
+                        highest = hand
+                        index = i
+                        break
+                    elif hand[j][1] == highest[j][1]:
+                        continue
+                    break      
+                elif hand[j][0] > highest[j][0]:
+                    highest = hand
+                    index = i
+                    break
+                break
+        finalHands.append(sortedHands.pop(index))
+    answer = 0
+    for i in range(len(finalHands)):
+        answer += (i+1) * int(finalHands[i][1])
+    print(answer)
 
-        finalHands.append(sortedHands.pop(toPop))
-    for hand in finalHands:
-        print(hand)
+    # 252997218 too high
