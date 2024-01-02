@@ -29,26 +29,36 @@ with open("day7/day7input.txt", "r") as file:
     while sortedHands:
         index = 0
         highest = [[0]]
+        found = False
         for i in range(len(sortedHands)):
             hand = sortedHands[i][0]
-            for j in range(len(hand)):
+            for j in range(len(hand)-1):
                 if hand[j][0] == highest[j][0]:
-                    if hand[j][1] > highest[j][1]:
-                        highest = hand
-                        index = i
-                        break
-                    elif hand[j][1] == highest[j][1]:
-                        continue
-                    break      
+                    continue
                 elif hand[j][0] > highest[j][0]:
                     highest = hand
                     index = i
+                    found = True
                     break
-                break
+                else:
+                    found = True
+                    break
+            if not found:
+                for k in range(len(hand)):
+                    if hand[k][1] > highest[k][1]:
+                        highest = hand
+                        index = i
+                    elif hand[k][1] == highest[k][1]:
+                        continue
+                    else:
+                        break
         finalHands.append(sortedHands.pop(index))
+        print(finalHands[-1])
+
     answer = 0
     for i in range(len(finalHands)):
         answer += (i+1) * int(finalHands[i][1])
+        # print(answer)
     print(answer)
 
     # 252997218 too high
