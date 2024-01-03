@@ -25,40 +25,40 @@ with open("day7/day7input.txt", "r") as file:
         temp.sort(reverse=True)
         sortedHands.append([temp, hand[1]])
 
+    def sorter(first, second, index, position):
+        if first[index][position] == second[index][position]:
+            return False
+        elif first[index][position] > second[index][position]:
+            return 1
+        else:
+            return 2
+
     finalHands = []
     while sortedHands:
         index = 0
         highest = [[0]]
-        found = False
         for i in range(len(sortedHands)):
             hand = sortedHands[i][0]
-            for j in range(len(hand)-1):
-                if hand[j][0] == highest[j][0]:
-                    continue
-                elif hand[j][0] > highest[j][0]:
-                    highest = hand
-                    index = i
-                    found = True
+            stop = False
+            for j in range(len(hand[0])):
+                if stop:
                     break
-                else:
-                    found = True
-                    break
-            if not found:
                 for k in range(len(hand)):
-                    if hand[k][1] > highest[k][1]:
-                        highest = hand
-                        index = i
-                    elif hand[k][1] == highest[k][1]:
-                        continue
-                    else:
+                    result = sorter(hand, highest, k, j)
+                    if result:
+                        if result == 1:
+                            highest = hand
+                            index = i
+                        elif result == 2:
+                            stop = True
                         break
         finalHands.append(sortedHands.pop(index))
-        print(finalHands[-1])
-
     answer = 0
     for i in range(len(finalHands)):
+        print(finalHands[i])
+        # print(i)
         answer += (i+1) * int(finalHands[i][1])
+        # print(finalHands[i][1])
         # print(answer)
     print(answer)
-
     # 252997218 too high
