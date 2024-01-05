@@ -72,11 +72,9 @@ with open("day7/day7input.txt", "r") as file:
         finalHands.append(sortedHands.pop(index))
 
     answer = 0
-    for i in reversed(range(len(finalHands))):
-        print(i)
+    finalHands = finalHands[::-1]
+    for i in range(len(finalHands)):
         print(finalHands[i])
-        answer += (i+1) * int(finalHands[i][1])
+        multiplier = i +1
+        answer += multiplier * int(finalHands[i][1])
     print(answer)
-    # 254205094
-    # 254205094 too high
-    # 252997218 too high
