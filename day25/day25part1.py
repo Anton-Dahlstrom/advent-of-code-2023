@@ -5,8 +5,16 @@
 
 # The recursive function that searches through all the nodes has to remember where it's already been and what the goal is.
 
-def searchNode(node, goal, visited):
-    pass
+def searchNode(node, goal, nodes, visited, paths):
+    visited.append(node)
+    for path in nodes[node]:
+        print("PATH: ", path)
+        if path == goal:
+            print("worked")
+            paths.append(visited)
+        else:
+            if path not in visited:
+                searchNode(path, goal, nodes, visited, paths)
 
 
 with open("day25/day25input.txt", "r") as file:
@@ -34,6 +42,10 @@ with open("day25/day25input.txt", "r") as file:
             if node == endpoint:
                 continue
 
-asd = ["j", "b", "c"]
-if "a" in asd:
-    print("hi")
+visited = []
+paths = []
+tester = {1: [3, 2], 2: [4], 3: [4], 4: [5]}
+searchNode(1, 5, tester, visited, paths)
+
+print(paths)
+print(visited)
