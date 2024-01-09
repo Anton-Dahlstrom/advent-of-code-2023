@@ -3,18 +3,19 @@
 # If a path kills two other paths that would otherwise co-exist it can't be an optimal route
 # How do I find the most paths without overlaps?
 
-# The recursive function that searches through all the nodes has to remember where it's already been and what the goal is.
+# When two paths are identical except one is longer the longer has to go.
+# I can find which paths can co-exist and which can't by iterating.
+# Visited should be a hmap.
 
+# The recursive function that searches through all the nodes has to remember where it's already been and what the goal is.
 def searchNode(node, goal, nodes, visited, paths):
     visited.append(node)
     for path in nodes[node]:
-        print("PATH: ", path)
         if path == goal:
-            print("worked")
             paths.append(visited)
         else:
             if path not in visited:
-                searchNode(path, goal, nodes, visited, paths)
+                searchNode(path, goal, nodes, visited.copy(), paths)
 
 
 with open("day25/day25input.txt", "r") as file:
@@ -26,7 +27,6 @@ with open("day25/day25input.txt", "r") as file:
         text = line.split(":")
         node = text[0]
         paths = text[1].strip().split(" ")
-        print(paths)
         if node not in hmap:
             hmap[node] = {}
         for path in paths:
@@ -34,18 +34,47 @@ with open("day25/day25input.txt", "r") as file:
                 hmap[node][path] = 1
             if path not in hmap:
                 hmap[path] = {node: 1}   
-    print(hmap)
-    
-    for node in hmap:
-        traveled = {}
-        for endpoint in hmap:
-            if node == endpoint:
-                continue
 
-visited = []
-paths = []
-tester = {1: [3, 2], 2: [4], 3: [4], 4: [5]}
-searchNode(1, 5, tester, visited, paths)
+    pathArray = []
+    visited = []
+    searchNode("jqt", "hfx", hmap, visited, pathArray)
+    print(pathArray)
 
-print(paths)
-print(visited)
+# If an array is too short to keep comparing it's the winner so we can pop and save it while we throw out all 
+# the other "living" arrays.
+
+# Remove all the indexes of arrays that don't follow the same paths.
+# When we find the shortest or only permutation of a path we pop to save it and pop all the other indexes.
+test = [['jqt', 'rhn', 'xhk'], ['jqt', 'rhn', 'bvb', 'xhk'], ['jqt', 'rhn', 'bvb'], ['jqt', 'rhn'], ['jqt', 'xhk'], ['jqt', 'nvd', 'lhk', 'cmg', 'bvb', 'xhk'], ['jqt', 'nvd', 'lhk', 'cmg', 'bvb']]
+
+asd = list(range(len(test)))
+print(asd)
+new = []
+saving = []
+
+# Indexes of all the lists
+indexes = list(range(len(test)))
+# Looks at each node in the path of index 0
+while indexes:
+    for i, value in enumerate(test[indexes[0]]):
+        # Makes a copy of the indexes we have so we can remove paths that don't overlap with the one we're looking at
+        # from the temp array and delete all the others that are left once we find the shortest one.
+        temp = indexes.copy()
+        searching = True
+        while searching:
+            for j, index in enumerate(temp):
+                # If the value of the array in this index doesn't match we remove it from temp.
+                if test[index][i] != value:
+                    temp.pop(j)
+                # When we find the shortest array we pop all of them from indexes and break the search
+                if len(test[index]) < i+1:
+                    searching = False
+                    shortest = temp.pop(j)
+                    saving.append(shortest)
+            if not searching:
+                for index in temp:
+                    pass
+                    # Remove from indexes
+            # Need to add the index in the indexes array so i know where to pop them
+            # I can do that where i make the temp.
+
