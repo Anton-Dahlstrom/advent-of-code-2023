@@ -38,7 +38,6 @@ with open("day25/day25input.txt", "r") as file:
     pathArray = []
     visited = []
     searchNode("jqt", "hfx", hmap, visited, pathArray)
-    print(pathArray)
 
 # If an array is too short to keep comparing it's the winner so we can pop and save it while we throw out all 
 # the other "living" arrays.
@@ -48,33 +47,34 @@ with open("day25/day25input.txt", "r") as file:
 test = [['jqt', 'rhn', 'xhk'], ['jqt', 'rhn', 'bvb', 'xhk'], ['jqt', 'rhn', 'bvb'], ['jqt', 'rhn'], ['jqt', 'xhk'], ['jqt', 'nvd', 'lhk', 'cmg', 'bvb', 'xhk'], ['jqt', 'nvd', 'lhk', 'cmg', 'bvb']]
 
 asd = list(range(len(test)))
-print(asd)
 new = []
 saving = []
 
 # Indexes of all the lists
 indexes = list(range(len(test)))
+
 # Looks at each node in the path of index 0
 while indexes:
+    temp = [[k, value] for k, value in enumerate(indexes.copy())]
+    # temp = indexes.copy()
     for i, value in enumerate(test[indexes[0]]):
         # Makes a copy of the indexes we have so we can remove paths that don't overlap with the one we're looking at
         # from the temp array and delete all the others that are left once we find the shortest one.
-        temp = indexes.copy()
-        searching = True
-        while searching:
-            for j, index in enumerate(temp):
-                # If the value of the array in this index doesn't match we remove it from temp.
-                if test[index][i] != value:
-                    temp.pop(j)
-                # When we find the shortest array we pop all of them from indexes and break the search
-                if len(test[index]) < i+1:
-                    searching = False
-                    shortest = temp.pop(j)
-                    saving.append(shortest)
-            if not searching:
-                for index in temp:
-                    pass
-                    # Remove from indexes
-            # Need to add the index in the indexes array so i know where to pop them
-            # I can do that where i make the temp.
-
+        found = False
+        for j, index in enumerate(temp):
+            # If the value of the array in this index doesn't match we remove it from temp.
+            if test[index[1]][i] != value:
+                temp.pop(j)
+            # When we find the shortest array we pop all of them from indexes and break the search
+            elif len(test[index[1]]) == i+1:
+                found = True
+                print(index, j)
+                shortest = index[1]
+                saving.append(shortest)
+        if found:
+            toPop = [duplicate for duplicate in temp[::-1]]
+            for duplicate in toPop:
+                indexes.pop(duplicate[0])
+            break
+        
+print(saving)
